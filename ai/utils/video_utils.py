@@ -1,8 +1,9 @@
-import imageio
-import tempfile
 import os
+import tempfile
+
 from moviepy import VideoFileClip
 from PIL import Image
+
 
 def extract_frame(video_bytes, second=1.0):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp:

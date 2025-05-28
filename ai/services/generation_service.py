@@ -1,16 +1,25 @@
-from utils.video_utils import extract_frame
-from models.sd_model import get_sd_pipeline
-import uuid
-import os
+import datetime
+import pathlib
 
-def generate_from_video_and_text(video_bytes, prompt: str):
-    init_image = extract_frame(video_bytes, second=1.0)
-    pipe = get_sd_pipeline()
+import models.sd_model
+import utils.video_utils
 
-    result = pipe(prompt=prompt, image=init_image, strength=0.75, guidance_scale=7.5).images[0]
 
-    filename = f"{uuid.uuid4().hex}.jpg"
-    path = os.path.join("static", "generated", filename)
-    result.save(path)
+def generate_from_video_and_text(video_bytes: bytes, prompt: str) -> str:
+    pipeline = models.sd_model.get_sd_pipeline()
+
+    init_image = utils.video_utils.extract_frame(video_bytes)
+
+    result = pipeline(
+        prompt=prompt,
+        image=init_image,
+        strength=0.7,
+        guidance_scale=7.5,
+    ).images[0]
+
+    output_path = pathlib.Path("static/generated")
+    filename = f"{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+    filepath = output_path / filename
+    result.save(filepath)
 
     return f"/static/generated/{filename}"
